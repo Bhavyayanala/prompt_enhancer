@@ -1,0 +1,142 @@
+Enhancing with mock (scripted-demo), style=short ...
+
+────────────────────────────────────────────────────────────────────────
+ENHANCED PROMPT
+────────────────────────────────────────────────────────────────────────
+
+## 1. Intent
+- **Product intent:** E-commerce website based on the idea "online store for handmade candles with stripe checkout".
+- **Primary objective:** let Customer complete the main action online with minimum friction.
+- **Business intent:** bring in more customers and reduce manual work for the Admin.
+- **Functional intent:** public information pages, the core ecommerce flow, and an admin area.
+- **Technical intent:** a responsive web app with a REST API and a relational database.
+- **Classification:** New build; domain: ecommerce; size: small (MVP in about 4 weeks).
+
+## 2. Requirements
+**Functional**
+- FR-1: Visitors can view Home, Product listing, Product details. [Confirmed]
+- FR-2: Customer can complete the core flow (Product listing -> Product details -> Cart). [Assumed]
+- FR-3: Admin can create, edit and delete User and Product records. [Assumed]
+- FR-4: Login/registration for personal features. [Assumed]
+- FR-5: Online payment handling. [Confirmed]
+**Non-functional**
+- NFR-1: Pages load in under 2 seconds on 4G (Lighthouse performance >= 85). [Assumed]
+- NFR-2: HTTPS everywhere, hashed passwords, input validation on the server. [Assumed]
+- NFR-3: WCAG 2.1 AA accessibility (contrast, keyboard navigation, alt text). [Assumed]
+- NFR-4: Responsive from 360px phones to 1440px desktops. [Assumed]
+**Implicit**
+- IR-1: Stock is checked at checkout to prevent overselling. [Assumed]
+- IR-2: Prices and totals are calculated on the server. [Assumed]
+- IR-3: Order status lifecycle (pending, paid, shipped, delivered, cancelled). [Assumed]
+- IR-4: Payment gateway with webhook verification. [Assumed]
+- IR-5: Search and category filters. [Assumed]
+
+## 3. Ambiguities and questions
+**Blocking questions**
+1. What is being sold (physical, digital, services) and to which countries?
+2. Which payment gateway and currency?
+**Assumptions (non-blocking gaps)**
+- A-1: The site's goal is to attract customers and let them complete the main action online.
+- A-2: Target users are local customers on mobile and desktop.
+- A-3: Clean, modern, accessible design with the business's brand colours.
+- A-4: React + Node.js/Express + PostgreSQL (see section 7).
+- A-5: Small team, MVP in about 4 weeks, single country and language.
+- A-6: Customers can browse without an account; login is only needed for personal features.
+
+## 4. Scope
+**MVP**
+- Home, Product listing, Product details, Cart
+- Core flow for Customer and admin management of User and Product
+**Optional**
+- Email notifications, reviews/ratings, analytics dashboard
+**Future enhancements**
+- Mobile app, loyalty programme, multi-language, multiple locations
+
+## 5. Users and journeys
+- **Guest**: read-only access to public pages.
+- **Customer**: own data only.
+- **Admin**: full access to the admin area.
+- **Main journey (Customer):** Home -> Product listing -> Product details -> Cart -> confirmation.
+- **Admin journey:** login -> admin dashboard -> manage User/Product -> publish.
+
+## 6. Architecture
+- **Frontend:** React SPA, calls the backend over HTTPS/JSON.
+- **Backend:** Node.js + Express REST API, JWT auth, validation layer.
+- **Database:** PostgreSQL accessed through an ORM.
+- **Integrations:** email provider, payment gateway, maps.
+- **Flow:** Browser -> React -> Express API -> PostgreSQL; admin uses the same API with an Admin role.
+
+## 7. Technology
+- React + Vite: fast, widely known, component based.
+- Node.js + Express: simple REST API in the same language as the frontend.
+- PostgreSQL: relational data with constraints and transactions.
+- Prisma ORM: typed schema and migrations.
+- Tailwind CSS: quick, consistent responsive styling.
+
+## 8. Database plan
+- **User**: id (PK), created_at, updated_at, plus domain fields.
+- **Product**: id (PK), created_at, updated_at, plus domain fields.
+- **Category**: id (PK), created_at, updated_at, plus domain fields.
+- **Cart**: id (PK), created_at, updated_at, plus domain fields.
+- **CartItem**: id (PK), created_at, updated_at, plus domain fields.
+- **Order**: id (PK), created_at, updated_at, plus domain fields.
+- **OrderItem**: id (PK), created_at, updated_at, plus domain fields.
+- **Payment**: id (PK), created_at, updated_at, plus domain fields.
+- **Address**: id (PK), created_at, updated_at, plus domain fields.
+- **Inventory**: id (PK), created_at, updated_at, plus domain fields.
+- **Relationships:** User 1-N Product; Category N-1 Inventory.
+- **Constraints:** unique emails, NOT NULL on required fields, foreign keys with ON DELETE RESTRICT, CHECK price >= 0.
+
+## 9. UI/UX plan
+- **Home**: header/navigation, main content, footer; clear primary action.
+- **Product listing**: header/navigation, main content, footer; clear primary action.
+- **Product details**: header/navigation, main content, footer; clear primary action.
+- **Cart**: header/navigation, main content, footer; clear primary action.
+- **Checkout**: header/navigation, main content, footer; clear primary action.
+- **Order confirmation**: header/navigation, main content, footer; clear primary action.
+- **Order history**: header/navigation, main content, footer; clear primary action.
+- **Login / register**: header/navigation, main content, footer; clear primary action.
+- **Admin: products & orders**: header/navigation, main content, footer; clear primary action.
+- **Behaviour:** mobile-first, skeleton loaders, friendly empty states, inline form validation, error toasts, keyboard accessible.
+
+## 10. Task breakdown
+- T1: Set up the repository, React frontend, Express API, PostgreSQL and CI. Depends on: none
+- T2: Create the database schema and migrations for User, Product, Category, Cart, CartItem. Depends on: T1
+- T3: Build authentication and role-based access for Admin. Depends on: T1, T2
+- T4: Build the public pages: Home, Product listing, Product details, Cart. Depends on: T1
+- T5: Build the core flow on Product listing -> Product details -> Cart with API endpoints. Depends on: T2, T4
+- T6: Build the admin screens to manage content and records. Depends on: T3, T5
+- T7: Add validation, loading, empty and error states on every page. Depends on: T4, T5, T6
+- T8: Write unit, integration and end-to-end tests for the MVP flows. Depends on: T5, T6
+- T9: Deploy frontend and backend with environment configuration. Depends on: T7, T8
+
+## 11. Risks
+- Security: injection and XSS. Mitigation: parameterised queries, output escaping, validation.
+- Auth: weak passwords or stolen tokens. Mitigation: bcrypt, short-lived JWT, rate-limited login.
+- Edge case: concurrent updates to the same record. Mitigation: transactions and optimistic locking.
+- Failure: third-party integration down. Mitigation: retries, clear error message, admin alert.
+
+## 12. Validation
+**Acceptance criteria**
+- Given a visitor on a phone, when they open Home, then the page loads in under 2 seconds and is readable.
+- Given a Customer, when they complete the core flow, then they see a confirmation.
+- Given an Admin, when they edit a Product, then the change is visible on the public site.
+**Testing requirements**
+- Unit tests for services and validation, integration tests for every API endpoint, end-to-end tests for the MVP journeys.
+
+────────────────────────────────────────────────────────────────────────
+CLARIFYING QUESTIONS
+  1. What is being sold (physical, digital, services) and to which countries?
+  2. Which payment gateway and currency?
+
+ASSUMPTIONS
+  - A-1: The site's goal is to attract customers and let them complete the main action online.
+  - A-2: Target users are local customers on mobile and desktop.
+  - A-3: Clean, modern, accessible design with the business's brand colours.
+  - A-4: React + Node.js/Express + PostgreSQL (see section 7).
+  - A-5: Small team, MVP in about 4 weeks, single country and language.
+  - A-6: Customers can browse without an account; login is only needed for personal features.
+
+────────────────────────────────────────────────────────────────────────
+SCORE  before 4/10  →  after 10/10
+3 agent steps · 4 model turns · 0.0s

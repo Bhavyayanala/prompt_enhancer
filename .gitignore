@@ -1,0 +1,16 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# deps & builds
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# logs & OS
+*.log
+.DS_Store
+.vscode/
+.idea/

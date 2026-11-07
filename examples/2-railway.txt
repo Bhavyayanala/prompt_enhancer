@@ -1,0 +1,144 @@
+Enhancing with mock (scripted-demo), style=technical ...
+
+────────────────────────────────────────────────────────────────────────
+ENHANCED PROMPT
+────────────────────────────────────────────────────────────────────────
+
+## 1. Intent
+- **Product intent:** Booking / ticketing website based on the idea "develop a website for railway ticket booking".
+- **Primary objective:** let Passenger (registered user) complete the main action online with minimum friction.
+- **Business intent:** bring in more customers and reduce manual work for the Admin (operator).
+- **Functional intent:** public information pages, the core booking flow, and an admin area.
+- **Technical intent:** a responsive web app with a REST API and a relational database.
+- **Classification:** New build; domain: booking; size: small (MVP in about 4 weeks).
+
+## 2. Requirements
+**Functional**
+- FR-1: Visitors can view Home / search, Search results, Seat selection. [Confirmed]
+- FR-2: Passenger (registered user) can complete the core flow (Search results -> Seat selection -> Passenger details). [Assumed]
+- FR-3: Admin (operator) can create, edit and delete User and Route records. [Assumed]
+- FR-4: Login/registration for personal features. [Assumed]
+- FR-5: Online payment handling. [Assumed]
+**Non-functional**
+- NFR-1: Pages load in under 2 seconds on 4G (Lighthouse performance >= 85). [Assumed]
+- NFR-2: HTTPS everywhere, hashed passwords, input validation on the server. [Assumed]
+- NFR-3: WCAG 2.1 AA accessibility (contrast, keyboard navigation, alt text). [Assumed]
+- NFR-4: Responsive from 360px phones to 1440px desktops. [Assumed]
+**Implicit**
+- IR-1: Seat inventory must never be double-booked (transactional seat hold with expiry). [Assumed]
+- IR-2: Booking reference / PNR generation and e-ticket. [Assumed]
+- IR-3: Cancellation and refund rules. [Assumed]
+- IR-4: Payment gateway integration with idempotent callbacks. [Assumed]
+- IR-5: Search by source, destination and date with availability. [Assumed]
+
+## 3. Ambiguities and questions
+**Blocking questions**
+1. Is this a real operator with its own inventory, or an aggregator using an external railway API?
+2. Is online payment in the MVP, and which gateway/country?
+**Assumptions (non-blocking gaps)**
+- A-1: The site's goal is to attract customers and let them complete the main action online.
+- A-2: Target users are local customers on mobile and desktop.
+- A-3: Clean, modern, accessible design with the business's brand colours.
+- A-4: React + Node.js/Express + PostgreSQL (see section 7).
+- A-5: Small team, MVP in about 4 weeks, single country and language.
+- A-6: Customers can browse without an account; login is only needed for personal features.
+- A-7: No online payment in the MVP unless the answer to question 2 says otherwise.
+
+## 4. Scope
+**MVP**
+- Home / search, Search results, Seat selection, Passenger details
+- Core flow for Passenger (registered user) and admin management of User and Route
+**Optional**
+- Email notifications, reviews/ratings, analytics dashboard
+**Future enhancements**
+- Mobile app, loyalty programme, multi-language, multiple locations
+
+## 5. Users and journeys
+- **Guest**: read-only access to public pages.
+- **Passenger (registered user)**: own data only.
+- **Admin (operator)**: full access to the admin area.
+- **Main journey (Passenger (registered user)):** Home / search -> Search results -> Seat selection -> Passenger details -> confirmation.
+- **Admin journey:** login -> admin dashboard -> manage User/Route -> publish.
+
+## 6. Architecture
+- **Frontend:** React SPA, calls the backend over HTTPS/JSON.
+- **Backend:** Node.js + Express REST API, JWT auth, validation layer.
+- **Database:** PostgreSQL accessed through an ORM.
+- **Integrations:** email provider, maps.
+- **Flow:** Browser -> React -> Express API -> PostgreSQL; admin uses the same API with an Admin role.
+
+## 7. Technology
+- React + Vite: fast, widely known, component based.
+- Node.js + Express: simple REST API in the same language as the frontend.
+- PostgreSQL: relational data with constraints and transactions.
+- Prisma ORM: typed schema and migrations.
+- Tailwind CSS: quick, consistent responsive styling.
+
+## 8. Database plan
+- **User**: id (PK), created_at, updated_at, plus domain fields.
+- **Route**: id (PK), created_at, updated_at, plus domain fields.
+- **Station**: id (PK), created_at, updated_at, plus domain fields.
+- **Train**: id (PK), created_at, updated_at, plus domain fields.
+- **Schedule**: id (PK), created_at, updated_at, plus domain fields.
+- **Seat**: id (PK), created_at, updated_at, plus domain fields.
+- **Booking**: id (PK), created_at, updated_at, plus domain fields.
+- **Passenger**: id (PK), created_at, updated_at, plus domain fields.
+- **Payment**: id (PK), created_at, updated_at, plus domain fields.
+- **Ticket**: id (PK), created_at, updated_at, plus domain fields.
+- **Relationships:** User 1-N Route; Station N-1 Ticket.
+- **Constraints:** unique emails, NOT NULL on required fields, foreign keys with ON DELETE RESTRICT, CHECK price >= 0.
+
+## 9. UI/UX plan
+- **Home / search**: header/navigation, main content, footer; clear primary action.
+- **Search results**: header/navigation, main content, footer; clear primary action.
+- **Seat selection**: header/navigation, main content, footer; clear primary action.
+- **Passenger details**: header/navigation, main content, footer; clear primary action.
+- **Payment**: header/navigation, main content, footer; clear primary action.
+- **Booking confirmation**: header/navigation, main content, footer; clear primary action.
+- **My bookings**: header/navigation, main content, footer; clear primary action.
+- **Login / register**: header/navigation, main content, footer; clear primary action.
+- **Admin: schedules & inventory**: header/navigation, main content, footer; clear primary action.
+- **Behaviour:** mobile-first, skeleton loaders, friendly empty states, inline form validation, error toasts, keyboard accessible.
+
+## 10. Task breakdown
+- T1: Set up the repository, React frontend, Express API, PostgreSQL and CI. Depends on: none
+- T2: Create the database schema and migrations for User, Route, Station, Train, Schedule. Depends on: T1
+- T3: Build authentication and role-based access for Admin. Depends on: T1, T2
+- T4: Build the public pages: Home / search, Search results, Seat selection, Passenger details. Depends on: T1
+- T5: Build the core flow on Search results -> Seat selection -> Passenger details with API endpoints. Depends on: T2, T4
+- T6: Build the admin screens to manage content and records. Depends on: T3, T5
+- T7: Add validation, loading, empty and error states on every page. Depends on: T4, T5, T6
+- T8: Write unit, integration and end-to-end tests for the MVP flows. Depends on: T5, T6
+- T9: Deploy frontend and backend with environment configuration. Depends on: T7, T8
+
+## 11. Risks
+- Security: injection and XSS. Mitigation: parameterised queries, output escaping, validation.
+- Auth: weak passwords or stolen tokens. Mitigation: bcrypt, short-lived JWT, rate-limited login.
+- Edge case: concurrent updates to the same record. Mitigation: transactions and optimistic locking.
+- Failure: third-party integration down. Mitigation: retries, clear error message, admin alert.
+
+## 12. Validation
+**Acceptance criteria**
+- Given a visitor on a phone, when they open Home, then the page loads in under 2 seconds and is readable.
+- Given a Passenger (registered user), when they complete the core flow, then they see a confirmation.
+- Given an Admin, when they edit a Route, then the change is visible on the public site.
+**Testing requirements**
+- Unit tests for services and validation, integration tests for every API endpoint, end-to-end tests for the MVP journeys.
+
+────────────────────────────────────────────────────────────────────────
+CLARIFYING QUESTIONS
+  1. Is this a real operator with its own inventory, or an aggregator using an external railway API?
+  2. Is online payment in the MVP, and which gateway/country?
+
+ASSUMPTIONS
+  - A-1: The site's goal is to attract customers and let them complete the main action online.
+  - A-2: Target users are local customers on mobile and desktop.
+  - A-3: Clean, modern, accessible design with the business's brand colours.
+  - A-4: React + Node.js/Express + PostgreSQL (see section 7).
+  - A-5: Small team, MVP in about 4 weeks, single country and language.
+  - A-6: Customers can browse without an account; login is only needed for personal features.
+  - A-7: No online payment in the MVP unless the answer to question 2 says otherwise.
+
+────────────────────────────────────────────────────────────────────────
+SCORE  before 3/10  →  after 10/10
+3 agent steps · 4 model turns · 0.0s
