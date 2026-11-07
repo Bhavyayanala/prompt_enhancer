@@ -19,7 +19,7 @@ The work is done by a real tool-calling agent: the model decides which tool to c
 |---|---|
 | Frontend | React 19 + Vite + TypeScript, `react-markdown` + `remark-gfm` |
 | Backend | Node.js 22 + Express 5 + TypeScript, `zod` for tool argument validation |
-| AI provider | **Google Gemini** (`gemini-2.5-flash`, native function calling) or **Groq** (OpenAI-compatible tool calling). A keyless `mock` provider exists for offline demos and tests |
+| AI provider | **Google Gemini** (`gemini-3.8-flash`, native function calling) or **Groq** (OpenAI-compatible tool calling). A keyless `mock` provider exists for offline demos and tests |
 | Containers | Docker multi-stage builds, nginx for the frontend, Docker Compose |
 | Tests | Vitest + Supertest (39 tests: tools, agent loop safety rules, API status codes, provider error mapping) |
 
@@ -100,7 +100,7 @@ Response:
     { "step": 3, "tool": "score_prompt",   "input": {...}, "output": {...}, "ok": true, "durationMs": 2 }
   ],
   "warning": null,
-  "meta": { "provider": "gemini", "model": "gemini-2.5-flash", "style": "detailed", "mode": "new", "modelTurns": 4, "durationMs": 21400 }
+  "meta": { "provider": "gemini", "model": "gemini-3.8-flash", "style": "detailed", "mode": "new", "modelTurns": 4, "durationMs": 21400 }
 }
 ```
 

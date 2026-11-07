@@ -20,7 +20,7 @@ export function getConfig() {
     port: num("PORT", 4000),
     provider,
     geminiApiKey: process.env.GEMINI_API_KEY?.trim() || "",
-    geminiModel: process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash",
+    geminiModel: process.env.GEMINI_MODEL?.trim() || "gemini-3.8-flash",
     groqApiKey: process.env.GROQ_API_KEY?.trim() || "",
     groqModel: process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile",
     /** Timeout for one call to the AI provider. */
